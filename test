@@ -210,6 +210,30 @@ else
 				fi
 				
 				exit
+		else
+				# 1 -- is file name
+				# rest is extension
+				var_compiler="$(cat $maindir/compiler)"
+				var_extended=""
+				for item in $@
+				do
+						if [ "$item" != "$1" ]
+						then
+							var_extended+="$item "
+						fi
+				done
+				
+				$var_compiler $1 $var_extended  
+
+				if [ $? == 0 ]
+				then
+						./a.out
+						rm a.out
+						echo -n "$1" > $maindir/prev_file
+						echo -n "$var_extended" > $maindir/extended
+				fi
+
+
 				
 		fi
 
