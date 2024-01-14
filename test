@@ -92,6 +92,13 @@ then
 				exit
 		fi
 
+		if [ "$1" == "-ex" ]
+		then
+				echo -n "" > $maindir/extended
+				echo "Lib extension cleared!!"
+				exit
+		fi
+
 		if [ "$1" == "-ce" ]			# change editor
 		then
 				echo -n "editor : "
@@ -157,7 +164,54 @@ then
 				rm a.out
 		fi
 		exit
+else 
+		# c <file_name> -extension
+		# c vim <file_name>
+		# c vim <file_name> -extension
+		# 1 -- file/editor
+		# 2 -- file/extesion
+		# 3.. -- extension
+		if [ "$1" == "$(cat $maindir/editor)" ]
+		then
+				# 2 is file then
+				var_compiler="$(cat $maindir/compiler)"
+				var_extended=""
+				if [ "$3" == "" ]
+				then
+						var_extended="$(cat $maindir/extended)"
+				else
+						for item in $@
+						do
+								if [[ "$item" != "$1" && "$item" != "$2" ]]
+								then
+									var_extended+="$item "
+								fi
+						done
 
+				fi
+				
+				$1 $2 $var_extended    # opening the editor with file
+				
+				if [ "$?" != 0 ]
+				then
+						echo "failed to launch editor!!"
+						exit
+				fi
+
+				$var_compiler $2 $var_extended   # compiling here!!
+
+				if [ "$?" == 0 ]
+				then
+						./a.out
+						rm a.out
+						echo -n "$2" > $maindir/prev_file
+						echo -n "$var_extended" > $maindir/extended
+
+				fi
+				
+				exit
+				
+		fi
 
 fi
 
